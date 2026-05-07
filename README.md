@@ -1,1 +1,436 @@
-# Full-stack-portfolio-website-
+Full Stack Personal Portfolio Website
+
+Project Title
+
+Personal Portfolio Website
+
+
+---
+
+Project Overview
+
+This is a full-stack personal portfolio website developed using:
+
+Frontend: HTML, CSS, JavaScript
+
+Backend: Node.js + Express.js
+
+Database: MongoDB
+
+Deployment: Vercel/Render
+
+
+The website allows users to:
+
+View portfolio details
+
+View skills and projects
+
+Contact through a form
+
+Store contact messages in database
+
+
+
+---
+
+Folder Structure
+
+portfolio-project/
+│
+├── client/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── server/
+│   ├── server.js
+│   ├── package.json
+│   └── .env
+│
+└── README.md
+
+
+---
+
+FRONTEND CODE
+
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Aman Kumar</h1>
+    <p>Computer Science Engineering Student</p>
+</header>
+
+<section class="about">
+    <h2>About Me</h2>
+    <p>
+        I am a passionate Computer Science Engineering student interested in web development and software engineering.
+    </p>
+</section>
+
+<section class="skills">
+    <h2>Skills</h2>
+    <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+        <li>Node.js</li>
+        <li>MongoDB</li>
+    </ul>
+</section>
+
+<section class="projects">
+    <h2>Projects</h2>
+
+    <div class="card">
+        <h3>Student Management System</h3>
+        <p>Database based student management project.</p>
+    </div>
+
+    <div class="card">
+        <h3>Portfolio Website</h3>
+        <p>Responsive full-stack portfolio website.</p>
+    </div>
+</section>
+
+<section class="contact">
+    <h2>Contact Me</h2>
+
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <textarea id="message" placeholder="Your Message"></textarea>
+        <button type="submit">Send</button>
+    </form>
+
+    <p id="response"></p>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+
+---
+
+style.css
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+}
+
+header {
+    background: #333;
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+section {
+    padding: 30px;
+}
+
+h2 {
+    color: #333;
+}
+
+ul {
+    list-style: square;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+
+---
+
+script.js
+
+const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const message = document.getElementById("message").value;
+
+    const response = await fetch("http://localhost:5000/contact", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email, message })
+    });
+
+    const data = await response.json();
+
+    document.getElementById("response").innerText = data.message;
+});
+
+
+---
+
+BACKEND CODE
+
+package.json
+
+{
+  "name": "portfolio-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0"
+  }
+}
+
+
+---
+
+.env
+
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+
+
+---
+
+server.js
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("MongoDB Connected"))
+.catch((err) => console.log(err));
+
+const contactSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    message: String
+});
+
+const Contact = mongoose.model("Contact", contactSchema);
+
+app.post("/contact", async (req, res) => {
+    try {
+        const contact = new Contact(req.body);
+        await contact.save();
+
+        res.json({
+            message: "Message Saved Successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+});
+
+app.get("/", (req, res) => {
+    res.send("Portfolio Backend Running");
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+
+---
+
+HOW TO RUN PROJECT
+
+Step 1: Install Node.js
+
+Download and install Node.js.
+
+
+---
+
+Step 2: Install Dependencies
+
+Open terminal inside server folder:
+
+npm install
+
+
+---
+
+Step 3: Run Backend
+
+npm start
+
+
+---
+
+Step 4: Open Frontend
+
+Open index.html in browser.
+
+
+---
+
+DATABASE
+
+MongoDB is used to store:
+
+Name
+
+Email
+
+Message
+
+
+
+---
+
+DEPLOYMENT
+
+Frontend Deployment
+
+Use:
+
+Vercel
+
+Netlify
+
+
+Backend Deployment
+
+Use:
+
+Render
+
+Railway
+
+
+
+---
+
+FEATURES
+
+Responsive Design
+
+Contact Form
+
+Database Integration
+
+Full Stack Architecture
+
+Clean UI
+
+
+
+---
+
+FUTURE ENHANCEMENTS
+
+Add Authentication
+
+Add Admin Panel
+
+Add Dark Mode
+
+Add Resume Download
+
+Add Project Images
+
+
+
+---
+
+CONCLUSION
+
+The Personal Portfolio Website is a modern full-stack web application that demonstrates frontend, backend, and database integration. It helps showcase technical skills and projects professionally.
+
+
+---
+
+VIVA QUESTIONS
+
+1. What is a full-stack website?
+
+A website that contains frontend, backend, and database.
+
+2. Why use MongoDB?
+
+MongoDB stores data in JSON-like documents and is easy to use.
+
+3. What is Express.js?
+
+Express.js is a backend framework for Node.js.
+
+4. What is the role of API?
+
+API helps frontend and backend communicate.
+
+5. Why use CSS?
+
+CSS is used for styling webpages.
+
+
+---
+
+RESUME DESCRIPTION
+
+Developed a full-stack personal portfolio website using HTML, CSS, JavaScript, Node.js, Express.js, and MongoDB with responsive design and contact form functionality.# Full-stack-portfolio-website-
